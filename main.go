@@ -7,26 +7,33 @@ import (
 	"os"
 
 	"github.com/google/generative-ai-go/genai"
+	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 )
 
 func main() {
-	GEMINI_API_KEY := "AIzaSyA1zuuF2IF5WxbliH7XJvwQGEjxM65dnwQ"
+	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading.env file")
+	}
 
 	ctx := context.Background()
 
-	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv(GEMINI_API_KEY)))
+	// Access API Key as environment variable
+	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer client.Close()
 
-	// For text-only input, use the gemini-pro model
+	// Gemini model version
 	model := client.GenerativeModel("gemini-pro")
-	resp, err := model.GenerateContent(ctx, genai.Text("Write a story about a magic backpack."))
+
+	response, err := model.GenerateContent(ctx, genai.Text("Write a story about a magic backpack."))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(resp)
+	// Display's information from the generative AI back to the user
+	fmt.Println(response)
 }
